@@ -55,7 +55,7 @@
                                 <div class="mt-2">
                                     <div>
                                         <label class="inline-flex items-center">
-                                            <input type="checkbox" name="is_expense" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-offset-0 focus:ring-indigo-200 focus:ring-opacity-50" value="1" @if($category->is_expense) checked @endif>
+                                            <input type="checkbox" name="is_expense" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-offset-0 focus:ring-indigo-200 focus:ring-opacity-50" @if($category->is_expense) checked @endif>
                                             <span class="ml-2">Категория расходов</span>
                                         </label>
                                     </div>

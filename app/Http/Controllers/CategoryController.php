@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Category\StoreRequest;
+use App\Http\Requests\Category\UpdateRequest;
 use App\Models\Category;
 use App\Models\Color;
 use App\Models\Icon;
@@ -45,31 +47,14 @@ class CategoryController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreRequest $request)
     {
-        $rules = [
-            'name' => ['required', 'max:255'],
-            'color_id' => ['required', 'integer', 'exists:colors,id'],
-            'icon_id' => ['required', 'integer', 'exists:icons,id'],
-            'is_expense' => ['boolean'],
-        ];
 
-        $messages = [
-            'name.required' => 'Укажите название!',
-            'name.max' => 'Укажите название длиной не более 255 символов!',
-            'color_id.required' => 'Выберите цвет категории!',
-            'icon_id.required' => 'Выберите значок категории!',
-        ];
-
-        $validated = $request->validate($rules, $messages);
-
-        if (!array_key_exists('is_expense', $validated)) $validated['is_expense'] = 0;
-
-        $validated['user_id'] = \Auth::id();
+        $validated = $request->validated();
 
         $category = Category::create($validated);
 
-        if (!empty($category)) {
+        if ($category) {
             return redirect()->route('category.edit', $category->id);
         } else {
             return back()->withInput()->withErrors();
@@ -110,7 +95,7 @@ class CategoryController extends Controller
             return view('category.edit', compact(['category', 'colorList', 'iconList']));
         }
 
-        return redirect('404');
+        return abort('404');
     }
 
     /**
@@ -120,23 +105,10 @@ class CategoryController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateRequest $request, $id)
     {
-        $rules = [
-            'name' => ['required', 'max:255'],
-            'color_id' => ['required', 'integer', 'exists:colors,id'],
-            'icon_id' => ['required', 'integer', 'exists:icons,id'],
-            'is_expense' => ['boolean'],
-        ];
 
-        $messages = [
-            'name.required' => 'Укажите название!',
-            'name.max' => 'Укажите название длиной не более 255 символов!',
-            'color_id.required' => 'Выберите цвет категории!',
-            'icon_id.required' => 'Выберите значок категории!',
-        ];
-
-        $validated = $request->validate($rules, $messages);
+        $validated = $request->validated();
 
         $category = Category::find($id);
 
