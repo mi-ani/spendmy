@@ -7,8 +7,6 @@ use App\Http\Requests\Category\UpdateRequest;
 use App\Models\Category;
 use App\Models\Color;
 use App\Models\Icon;
-use App\Models\Operation;
-use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
@@ -44,7 +42,7 @@ class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param StoreRequest $request
      * @return \Illuminate\Http\Response
      */
     public function store(StoreRequest $request)
@@ -101,7 +99,7 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param UpdateRequest $request
      * @param int $id
      * @return \Illuminate\Http\Response
      */

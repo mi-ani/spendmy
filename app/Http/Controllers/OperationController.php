@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Operation\StoreRequest;
+use App\Http\Requests\Operation\UpdateRequest;
 use App\Models\Category;
 use App\Models\Operation;
-use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
 class OperationController extends Controller
@@ -52,28 +53,13 @@ class OperationController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param StoreRequest $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreRequest $request)
     {
 
-        $rules = [
-            'amount' => ['required', 'numeric', 'min:1', 'max:9999999999.99'],
-            'category_id' => ['required', 'integer', 'exists:categories,id'],
-            'date' => ['date']
-        ];
-
-        $messages = [
-            'amount.required' => 'Введите сумму!',
-            'amount.numeric' => 'Введите сумму, введенной значение должно быть числом!',
-            'amount.min' => 'Вы ввели слишком маленькое число!',
-            'amount.max' => 'Вы ввели слишком большое число!',
-            'category_id.required' => 'Выберите категорию!',
-            'date' => 'Введите дату!'
-        ];
-
-        $validated = $request->validate($rules, $messages);
+        $validated = $request->validated();
 
         if(!array_key_exists('date', $validated)) $validated['date'] = Carbon::now();
 
@@ -122,28 +108,14 @@ class OperationController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param UpdateRequest $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateRequest $request, $id)
     {
-        $rules = [
-            'amount' => ['required', 'numeric', 'min:1', 'max:9999999999.99'],
-            'category_id' => ['required', 'integer', 'exists:categories,id'],
-            'date' => ['date']
-        ];
 
-        $messages = [
-            'amount.required' => 'Введите сумму!',
-            'amount.numeric' => 'Введите сумму, введенной значение должно быть числом!',
-            'amount.min' => 'Вы ввели слишком маленькое число!',
-            'amount.max' => 'Вы ввели слишком большое число!',
-            'category_id.required' => 'Выберите категорию!',
-            'date' => 'Введите дату!'
-        ];
-
-        $validated = $request->validate($rules, $messages);
+        $validated = $request->validated();
 
         if(!array_key_exists('date', $validated)) $validated['date'] = Carbon::now();
 

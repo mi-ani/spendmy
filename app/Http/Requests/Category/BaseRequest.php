@@ -4,7 +4,7 @@ namespace App\Http\Requests\Category;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class BaseRequest extends FormRequest
+abstract class BaseRequest extends FormRequest
 {
     /**
      * Prepare the data for validation.
