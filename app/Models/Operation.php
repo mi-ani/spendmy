@@ -15,4 +15,12 @@ class Operation extends Model
         'amount',
         'category_id'
     ];
+
+    /**
+     * Получить категорию, которой принадлежит операция
+     */
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 }

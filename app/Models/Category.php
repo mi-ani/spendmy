@@ -18,21 +18,41 @@ class Category extends Model
         'icon_id'
     ];
 
+    /**
+     * Получить операции принадлежащие категории
+    */
     public function operations()
     {
         return $this->hasMany(Operation::class);
     }
 
+    /**
+     * Получить цвет, которому принадлежит категория
+    */
     public function color()
     {
         return $this->belongsTo(Color::class);
     }
 
+    /**
+     * Получить иконку, которой принадлежит категория
+    */
     public function icon()
     {
         return $this->belongsTo(Icon::class);
     }
 
+    /**
+     * Получить пользователя, которому принадлежит категория
+    */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Переопределям метод удаления модели
+    */
     public function delete()
     {
         // Удаляем все операции принадлежащие удаляемой категории

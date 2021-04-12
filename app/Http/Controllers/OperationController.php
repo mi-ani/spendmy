@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Operation\DestroyRequest;
 use App\Http\Requests\Operation\StoreRequest;
 use App\Http\Requests\Operation\UpdateRequest;
 use App\Models\Category;
@@ -134,10 +135,11 @@ class OperationController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param DestroyRequest $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(DestroyRequest $request,$id)
     {
         $operation = Operation::find($id);
 

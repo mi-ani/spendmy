@@ -3,8 +3,9 @@
 namespace App\Http\Requests\Category;
 
 use App\Models\Category;
+use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateRequest extends BaseRequest
+class DestroyRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -15,11 +16,24 @@ class UpdateRequest extends BaseRequest
     {
         $categoryOwner = Category::find($this->route('id'))
             ->user()
+            ->get()
             ->first();
 
         if ($categoryOwner->id === \Auth::id())
             return true;
 
         return false;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
+    public function rules()
+    {
+        return [
+            //
+        ];
     }
 }

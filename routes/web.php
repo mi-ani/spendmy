@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\OperationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,14 +20,18 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->middleware(['auth'])
-    ->name('dashboard');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard');
 
-Route::resource('category', \App\Http\Controllers\CategoryController::class)
-    ->middleware(['auth']);
+    Route::resource('/category', CategoryController::class)
+        ->names('category')
+        ->parameter('category', 'id');
 
-Route::resource('operations', \App\Http\Controllers\OperationController::class)
-    ->middleware(['auth']);
+    Route::resource('/operations', OperationController::class)
+        ->except(['show'])
+        ->names('operations')
+        ->parameter('operations', 'id');
+});
 
 require __DIR__ . '/auth.php';

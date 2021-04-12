@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Category\DestroyRequest;
 use App\Http\Requests\Category\StoreRequest;
 use App\Http\Requests\Category\UpdateRequest;
 use App\Models\Category;
@@ -122,10 +123,11 @@ class CategoryController extends Controller
     /**
      * Remove the specified resource from storage.
      *
+     * @param DestroyRequest $request
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(DestroyRequest $request, $id)
     {
         $category = Category::find($id);
 
