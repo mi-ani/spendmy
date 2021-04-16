@@ -7,6 +7,7 @@ use App\Http\Requests\Operation\StoreRequest;
 use App\Http\Requests\Operation\UpdateRequest;
 use App\Models\Operation;
 use App\Repositories\CategoryRepository;
+use App\Repositories\OperationRepository;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 
@@ -16,9 +17,10 @@ class OperationController extends Controller
      * Display a listing of the resource.
      *
      * @param CategoryRepository $categoryRepository
+     * @param OperationRepository $operationRepository
      * @return Response
      */
-    public function index(CategoryRepository $categoryRepository)
+    public function index(CategoryRepository $categoryRepository, OperationRepository $operationRepository)
     {
         $categories = $categoryRepository->getUserCategories();
 
@@ -26,9 +28,7 @@ class OperationController extends Controller
 
         $categories = $categories->groupBy('id');
 
-        $dates = Operation::whereIn('category_id', $categoryIds)
-            ->select(['id', 'date', 'amount', 'category_id'])
-            ->get()
+        $dates = $operationRepository->getOperationsBelongsToCategories($categoryIds)
             ->groupBy('date')
             ->sortKeysDesc();
 
@@ -64,10 +64,9 @@ class OperationController extends Controller
 
         $operation = Operation::create($validated);
 
-        if ($operation) {
+        if ($operation)
             return redirect()->route('operations.edit', $operation->id);
-        }
-
+        
         return back()->withInput()->withErrors();
 
     }
@@ -87,14 +86,15 @@ class OperationController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param CategoryRepository $categoryRepository
+     * @param OperationRepository $operationRepository
      * @param int $id
      * @return Response
      */
-    public function edit(CategoryRepository $categoryRepository, $id)
+    public function edit(CategoryRepository $categoryRepository, OperationRepository $operationRepository, $id)
     {
         $categories = $categoryRepository->getUserCategories();
 
-        $operation = Operation::find($id);
+        $operation = $operationRepository->getOperation($id);
 
         if ($operation)
             return view('operations.edit', compact(['operation', 'categories']));
@@ -106,17 +106,18 @@ class OperationController extends Controller
      * Update the specified resource in storage.
      *
      * @param UpdateRequest $request
+     * @param OperationRepository $operationRepository
      * @param int $id
      * @return Response
      */
-    public function update(UpdateRequest $request, $id)
+    public function update(UpdateRequest $request, OperationRepository $operationRepository, $id)
     {
 
         $validated = $request->validated();
 
         if (!array_key_exists('date', $validated)) $validated['date'] = Carbon::now();
 
-        $operation = Operation::find($id);
+        $operation = $operationRepository->getOperation($id);
 
         if ($operation) {
             $updated = $operation->update($validated);
@@ -132,19 +133,21 @@ class OperationController extends Controller
      * Remove the specified resource from storage.
      *
      * @param DestroyRequest $request
+     * @param OperationRepository $operationRepository
      * @param int $id
      * @return Response
      */
-    public function destroy(DestroyRequest $request, $id)
+    public function destroy(DestroyRequest $request, OperationRepository $operationRepository, $id)
     {
-        $operation = Operation::find($id);
+        $operation = $operationRepository->getOperation($id);
 
         if ($operation) {
             $deleted = $operation->delete();
 
-            return redirect()->route('operations.index');
+            if ($deleted)
+                return redirect()->route('operations.index');
         }
 
-        return redirect()->back();
+        return redirect()->back()->withErrors();
     }
 }
