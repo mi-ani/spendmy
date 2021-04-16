@@ -2,27 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Response;
 use App\Http\Requests\Category\DestroyRequest;
 use App\Http\Requests\Category\StoreRequest;
 use App\Http\Requests\Category\UpdateRequest;
-use App\Models\Category;
 use App\Models\Color;
 use App\Models\Icon;
+use App\Models\Category;
+use App\Repositories\CategoryRepository;
 
 class CategoryController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param CategoryRepository $categoryRepository
+     * @return Response
      */
-    public function index()
+    public function index(CategoryRepository $categoryRepository)
     {
-
-        $categoryList = Category::with(['color:id,hex', 'icon:id,path'])
-            ->select(['id', 'is_expense', 'name', 'icon_id', 'color_id', 'user_id'])
-            ->where('user_id', '=', \Auth::id())
-            ->get();
+        $categoryList = $categoryRepository->getUserCategories();
 
         return view('category.index', compact('categoryList'));
     }
@@ -30,12 +30,12 @@ class CategoryController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create()
     {
-        $colorList = Color::select(['id', 'hex'])->get();
-        $iconList = Icon::select(['id', 'path'])->get();
+        $colorList = Color::all();
+        $iconList = Icon::all();
 
         return view('category.create', compact(['colorList', 'iconList']));
     }
@@ -44,7 +44,7 @@ class CategoryController extends Controller
      * Store a newly created resource in storage.
      *
      * @param StoreRequest $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(StoreRequest $request)
     {
@@ -64,14 +64,12 @@ class CategoryController extends Controller
      * Display the specified resource.
      *
      * @param int $id
-     * @return \Illuminate\Http\Response
+     * @param CategoryRepository $categoryRepository
+     * @return Response
      */
-    public function show($id)
+    public function show(CategoryRepository $categoryRepository, $id)
     {
-        $category = Category::with(['operations:id,date,amount,category_id', 'color:id,hex', 'icon:id,path'])
-            ->where('id', $id)
-            ->get()
-            ->first();
+        $category = $categoryRepository->getCategoryWithOperations($id);
 
         if ($category) {
             return view('category.show', compact('category'));
@@ -81,16 +79,18 @@ class CategoryController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
+     * @param CategoryRepository $categoryRepository
      * @param int $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function edit($id)
+    public function edit(CategoryRepository $categoryRepository, $id)
     {
-        $category = Category::find($id);
+        $category = $categoryRepository->getCategory($id);
 
         if ($category) {
-            $colorList = Color::select(['id', 'hex'])->get();
-            $iconList = Icon::select(['id', 'path'])->get();
+            $colorList = Color::all();
+            $iconList = Icon::all();
+
             return view('category.edit', compact(['category', 'colorList', 'iconList']));
         }
 
@@ -101,15 +101,16 @@ class CategoryController extends Controller
      * Update the specified resource in storage.
      *
      * @param UpdateRequest $request
+     * @param CategoryRepository $categoryRepository
      * @param int $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function update(UpdateRequest $request, $id)
+    public function update(UpdateRequest $request, CategoryRepository $categoryRepository, $id)
     {
 
         $validated = $request->validated();
 
-        $category = Category::find($id);
+        $category = $categoryRepository->getCategory($id);
 
         if ($category) {
             $category->update($validated);
@@ -124,12 +125,13 @@ class CategoryController extends Controller
      * Remove the specified resource from storage.
      *
      * @param DestroyRequest $request
+     * @param CategoryRepository $categoryRepository
      * @param int $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function destroy(DestroyRequest $request, $id)
+    public function destroy(DestroyRequest $request, CategoryRepository $categoryRepository, $id)
     {
-        $category = Category::find($id);
+        $category = $categoryRepository->getCategory($id);
 
         if ($category) {
             $categoryDeleted = $category->delete();

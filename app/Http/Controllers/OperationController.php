@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Operation\DestroyRequest;
 use App\Http\Requests\Operation\StoreRequest;
 use App\Http\Requests\Operation\UpdateRequest;
-use App\Models\Category;
 use App\Models\Operation;
+use App\Repositories\CategoryRepository;
+use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 
 class OperationController extends Controller
@@ -14,14 +15,12 @@ class OperationController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param CategoryRepository $categoryRepository
+     * @return Response
      */
-    public function index()
+    public function index(CategoryRepository $categoryRepository)
     {
-        $categories = Category::with(['color:id,hex', 'icon:id,path'])
-            ->select(['id', 'name', 'is_expense', 'color_id', 'icon_id'])
-            ->where('user_id', \Auth::id())
-            ->get();
+        $categories = $categoryRepository->getUserCategories();
 
         $categoryIds = $categories->pluck('id')->toArray();
 
@@ -39,14 +38,12 @@ class OperationController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param CategoryRepository $categoryRepository
+     * @return Response
      */
-    public function create()
+    public function create(CategoryRepository $categoryRepository)
     {
-        $categories = Category::with(['color:id,hex', 'icon:id,path'])
-            ->select(['id', 'name', 'is_expense', 'color_id', 'icon_id'])
-            ->where('user_id', \Auth::id())
-            ->get();
+        $categories = $categoryRepository->getUserCategories();
 
         return view('operations.create', compact('categories'));
     }
@@ -55,18 +52,19 @@ class OperationController extends Controller
      * Store a newly created resource in storage.
      *
      * @param StoreRequest $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(StoreRequest $request)
     {
 
         $validated = $request->validated();
 
-        if(!array_key_exists('date', $validated)) $validated['date'] = Carbon::now();
+        if (!array_key_exists('date', $validated))
+            $validated['date'] = Carbon::now();
 
         $operation = Operation::create($validated);
 
-        if($operation){
+        if ($operation) {
             return redirect()->route('operations.edit', $operation->id);
         }
 
@@ -77,8 +75,8 @@ class OperationController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     * @return Response
      */
     public function show($id)
     {
@@ -88,20 +86,18 @@ class OperationController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param CategoryRepository $categoryRepository
+     * @param int $id
+     * @return Response
      */
-    public function edit($id)
+    public function edit(CategoryRepository $categoryRepository, $id)
     {
-        $categories = Category::with(['color:id,hex', 'icon:id,path'])
-            ->select(['id', 'name', 'is_expense', 'color_id', 'icon_id'])
-            ->where('user_id', \Auth::id())
-            ->get();
+        $categories = $categoryRepository->getUserCategories();
 
         $operation = Operation::find($id);
 
-        if($operation)
-            return view('operations.edit', compact(['operation' ,'categories']));
+        if ($operation)
+            return view('operations.edit', compact(['operation', 'categories']));
 
         return redirect('404');
     }
@@ -111,21 +107,21 @@ class OperationController extends Controller
      *
      * @param UpdateRequest $request
      * @param int $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(UpdateRequest $request, $id)
     {
 
         $validated = $request->validated();
 
-        if(!array_key_exists('date', $validated)) $validated['date'] = Carbon::now();
+        if (!array_key_exists('date', $validated)) $validated['date'] = Carbon::now();
 
         $operation = Operation::find($id);
 
-        if($operation){
+        if ($operation) {
             $updated = $operation->update($validated);
 
-            if($updated)
+            if ($updated)
                 return redirect()->route('operations.edit', $operation->id);
         }
 
@@ -137,13 +133,13 @@ class OperationController extends Controller
      *
      * @param DestroyRequest $request
      * @param int $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function destroy(DestroyRequest $request,$id)
+    public function destroy(DestroyRequest $request, $id)
     {
         $operation = Operation::find($id);
 
-        if($operation){
+        if ($operation) {
             $deleted = $operation->delete();
 
             return redirect()->route('operations.index');
