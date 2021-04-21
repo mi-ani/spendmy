@@ -3,34 +3,36 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Repositories\CategoryRepository;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request, CategoryRepository $categoryRepository)
     {
-        $user = \Auth::user();
-        $date = [
-            'from' => Carbon::today()->startOfMonth(),
-            'to' => Carbon::today()->endOfMonth()
+        $rules = [
+            'from' => ['date'],
+            'to' => ['date']
         ];
 
-        $categoriesWithOperations =
-            Category::with(['operations' => function ($query) use ($date) {
-                $query->select(['id', 'date', 'amount', 'category_id']);
-                //$query->whereBetween('date', $date);
-                $query->orderByDesc('date');
-            }, 'color:id,hex', 'icon:id,path'])
-                ->select(['id', 'is_expense', 'name', 'color_id', 'icon_id', 'user_id'])
-                ->where('user_id', "=", $user->id)
-                ->get()
-                ->groupBy('is_expense');
+        $validated = $request->validate($rules);
 
+        $dateInterval = [
+            'from' => $validated['from'] ?? Carbon::today()->startOfMonth(),
+            'to' => $validated['to'] ?? Carbon::today()->endOfMonth()
+        ];
 
-        //dd($categoriesWithOperations);
+        /* Получаем все категории пользователя
+         * по которым есть операции между 2-х дат
+         * вместе с операциями, цветами и иконками,
+         * сгруппированные по доходам/расходам [0/1]
+         * */
+        $categoryGroups = $categoryRepository
+            ->getCategoriesWhereHasOperationsBetweenDateInterval($dateInterval)
+            ->groupBy('is_expense');
 
-        return view('dashboard.index', compact('categoriesWithOperations'));
+        return view('dashboard.index', compact(['categoryGroups', 'dateInterval']));
     }
 }
