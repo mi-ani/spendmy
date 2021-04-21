@@ -1,3 +1,19 @@
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
+
+.menu-item--active{
+    position: relative;
+}
+
+.menu-item--active::after{
+    content: "";
+    width: 4px;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    right: -4px;
+    background: #994ff3;
+}
+
+
