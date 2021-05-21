@@ -22,9 +22,9 @@ class CategoryController extends Controller
      */
     public function index(CategoryRepository $categoryRepository)
     {
-        $categoryList = $categoryRepository->getUserCategories();
+        $categories = $categoryRepository->getUserCategories();
 
-        return view('category.index', compact('categoryList'));
+        return view('category.index', compact('categories'));
     }
 
     /**
