@@ -35,6 +35,9 @@
                     @endforeach
                 @endif
             </div>
+            <div class="py-2 px-4 bg-secondary flex justify-between items-center">
+                {{ $categories->links('pagination.simple') }}
+            </div>
         </div>
     </x-page-template>
 

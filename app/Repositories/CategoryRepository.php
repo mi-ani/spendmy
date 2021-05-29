@@ -34,6 +34,25 @@ class CategoryRepository extends BaseRepository
     }
 
     /**
+     * Получить все категории аутентифицированного пользоватеся с цветами и иконками, с разбивкой на страницы
+     * 10 элементов на страницу по умолчанию.
+     *
+     * @param int $count
+     * @return Collection
+     */
+    public function getUserCategoriesWithPaginate($count = 10)
+    {
+
+        $categories = $this->startConditions()
+            ->with(['color:id,hex', 'icon:id,path'])
+            ->select(['id', 'is_expense', 'name', 'icon_id', 'color_id', 'user_id'])
+            ->where('user_id', \Auth::id())
+            ->paginate($count);
+
+        return $categories;
+    }
+
+    /**
      * Получить категорию вместе с операциями, цветом и иконкой по id
      *
      * @param integer $id
