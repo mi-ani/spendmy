@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Category;
 
+use App\Models\Category;
 use Illuminate\Foundation\Http\FormRequest;
 
 abstract class BaseRequest extends FormRequest
@@ -31,7 +32,14 @@ abstract class BaseRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        $categoryOwner = Category::find($this->route('id'))
+            ->user()
+            ->first();
+
+        if ($categoryOwner->id === \Auth::id())
+            return true;
+
+        return false;
     }
 
     /**
