@@ -26,13 +26,9 @@ class OperationController extends Controller
 
         $categoryIds = $categories->pluck('id')->toArray();
 
-        $categories = $categories->groupBy('id');
+        $operations = $operationRepository->getOperationsBelongsToCategoriesWithPaginate($categoryIds);
 
-        $dates = $operationRepository->getOperationsBelongsToCategories($categoryIds)
-            ->groupBy('date')
-            ->sortKeysDesc();
-
-        return view('operations.index', compact(['categories', 'dates']));
+        return view('operations.index', compact(['categories', 'operations']));
     }
 
     /**
@@ -66,7 +62,7 @@ class OperationController extends Controller
 
         if ($operation)
             return redirect()->route('operations.edit', $operation->id);
-        
+
         return back()->withInput()->withErrors();
 
     }

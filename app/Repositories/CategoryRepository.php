@@ -40,14 +40,14 @@ class CategoryRepository extends BaseRepository
      * @param int $count
      * @return Collection
      */
-    public function getUserCategoriesWithPaginate($count = 10)
+    public function getUserCategoriesWithPaginate(int $pages = null)
     {
 
         $categories = $this->startConditions()
             ->with(['color:id,hex', 'icon:id,path'])
             ->select(['id', 'is_expense', 'name', 'icon_id', 'color_id', 'user_id'])
             ->where('user_id', \Auth::id())
-            ->paginate($count);
+            ->paginate($pages ?? 10);
 
         return $categories;
     }

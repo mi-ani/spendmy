@@ -8,7 +8,7 @@
         </div>
     </section>
     @php
-        /** @var \Illuminate\Database\Eloquent\Collection $category */
+        /** @var Illuminate\Database\Eloquent\Collection $category */
         $formatter = new NumberFormatter( 'ru_RU', NumberFormatter::CURRENCY);
         $formatter->setSymbol(NumberFormatter::CURRENCY_SYMBOL, '₽');
     @endphp

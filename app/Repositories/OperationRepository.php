@@ -20,10 +20,10 @@ class OperationRepository extends BaseRepository
     /**
      * Получить операцию по id
      *
-     * @param $id
+     * @param int $id
      * @return Model
      */
-    public function getOperation($id)
+    public function getOperation(int $id)
     {
         $operation = $this->startConditions()->find($id);
 
@@ -40,6 +40,22 @@ class OperationRepository extends BaseRepository
         $operations = $this->startConditions()
             ->whereIn('category_id', $categories)
             ->get();
+
+        return $operations;
+    }
+
+    /**
+     * Получить операции принадлежащие категориям
+     *
+     * @param array $categories
+     * @param int $pages
+     * @return Collection
+     */
+    public function getOperationsBelongsToCategoriesWithPaginate(array $categories, int $pages = null){
+        $operations = $this->startConditions()
+            ->whereIn('category_id', $categories)
+            ->orderBy('date', 'desc')
+            ->paginate($pages ?? 50);
 
         return $operations;
     }
