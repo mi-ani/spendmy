@@ -20,8 +20,9 @@ class DestroyRequest extends FormRequest
             ->user()
             ->first();
 
-        if ($categoryOwner->id === \Auth::id())
+        if ($categoryOwner->id === \Auth::id()) {
             return true;
+        }
 
         return false;
     }
